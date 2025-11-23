@@ -8,36 +8,42 @@ You need Slack user token to authenticate your program. Please refer Slack manua
 ## Dependencies
 
 No external dependencies other than libcurl. In Ubuntu 24, install it with
-    % apt install libcurl4-openssl-dev`
-
+```
+% apt install libcurl4-openssl-dev`
+```
 ## Compilation
 
 Edit the AUTH line, replace token with your one.
 Compile with
-    % gcc -o spr spr.c -l curl
-
+```
+% gcc -o spr spr.c -l curl
+```
 ## Installation
 
 You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy files from daemontools directory to your services' locatoin. Make sure 'run' and 'log/run' have executable bit set. Copy 'spr' executable to the same directory. Activate as usual with 'ln -s spr'.
+Copy files from daemontools directory to your services' locatoin. Make sure **'run'** and **'log/run'** have executable bit set. Copy **'spr'** executable to the same directory. Activate as usual with **'ln -s spr'**.
 
 ### Systemd
 
 Copy service definition file to the user directory:
-    % sudo cp systemd/spr.service /etc/systemd/user/
-
+```
+% sudo cp systemd/spr.service /etc/systemd/user/
+```
 Make sure you've stated correct path tho the spr executable at the spr.service definition
 
 Tell systemd reload, enable and start your service:
-    % systemctl --user daemon-reload
-    % systemctl --user enable spr
-    % systemctl --user start spr
-
+```
+% systemctl --user daemon-reload
+% systemctl --user enable spr
+% systemctl --user start spr
+```
 ## Troubleshooting
 
 Here's command line debug curl invocation (use your token here). You want to see JSON output starting with '"ok":true' from server
+```
+% curl -q -H "Authorization: Bearer xoxp-XXXXXXXXXX-XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" -H "Content-type: application/json; charset=utf-8" https://slack.com/api/users.profile.set -X POST -d'{"profile": {"status_text": "On Battery", "status_emoji": ":battery:", "status_expiration": 0}}'
+```
 
-    % curl -q -H "Authorization: Bearer xoxp-XXXXXXXXXX-XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" -H "Content-type: application/json; charset=utf-8" https://slack.com/api/users.profile.set -X POST -d'{"profile": {"status_text": "On Battery", "status_emoji": ":battery:", "status_expiration": 0}}'
