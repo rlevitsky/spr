@@ -32,7 +32,7 @@ Copy service definition file to the user directory:
 ```
 % sudo cp systemd/spr.service /etc/systemd/user/
 ```
-Make sure you've stated correct path tho the spr executable at the spr.service definition
+Make sure you've stated correct path to the **spr** executable at the **spr.service** definition
 
 Tell systemd reload, enable and start your service:
 ```
@@ -42,7 +42,7 @@ Tell systemd reload, enable and start your service:
 ```
 ## Troubleshooting
 
-Here's command line debug curl invocation (use your token here). You want to see JSON output starting with '"ok":true' from server
+Here's command line debug curl invocation (use your token here). You want to see JSON output starting with **"ok":true** from server
 ```
 % curl -q -H "Authorization: Bearer xoxp-XXXXXXXXXX-XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" -H "Content-type: application/json; charset=utf-8" https://slack.com/api/users.profile.set -X POST -d'{"profile": {"status_text": "On Battery", "status_emoji": ":battery:", "status_expiration": 0}}'
 ```
