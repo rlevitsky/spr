@@ -9,11 +9,12 @@ You need Slack user token to authenticate your program. Please refer Slack manua
 
 No external dependencies other than libcurl. In Ubuntu 24, install it with
 ```
-% apt install libcurl4-openssl-dev`
+% apt install libcurl4-openssl-dev
 ```
 ## Compilation
 
-Edit the AUTH line, replace token with your one.
+Edit the AUTH line at the **spr.c** file, replace the token with your own one.
+
 Compile with
 ```
 % gcc -o spr spr.c -l curl
