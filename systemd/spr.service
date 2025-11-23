@@ -1,0 +1,10 @@
+[Unit]
+Description=Slack Power Reporter
+
+[Service]
+Type=simple
+ExecStart=/home/rle/service/spr/spr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

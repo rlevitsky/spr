@@ -94,9 +94,9 @@ int do_curl (int status)
   }
   char *a = strstr(docbuf.bp, "\"ok\":true");
   if ( a != NULL ) {
-    printf("Ok received\n");
+    fprintf(stdout, "Ok received\n");
   }
-  else printf("Ok not found\n%s\n", (char *)docbuf.bp);
+  else fprintf(stdout, "Ok not found\n%s\n", (char *)docbuf.bp);
   return 0;
 }
 
@@ -144,7 +144,8 @@ int main (int argc, char **argv)
     else slack_status = 9;
   
     strftime(timestring, 21, "%Y-%m-%dT%H:%M:%SZ", t);
-    printf("%s %s %d\n", timestring, buf, percent);
+    //fprintf(stdout,"%s %s %d\n", timestring, buf, percent);
+    fprintf(stdout,"%s %d\n", buf, percent);
 
     fp = fopen(tmpfile, "r+");
     if (fp == NULL) {
@@ -155,7 +156,7 @@ int main (int argc, char **argv)
       }
       else {
         saved_slack_status = slack_status;
-        printf("Writing new status to file\n");
+        fprintf(stdout, "Writing new status to file\n");
         fwrite(&slack_status, sizeof(int), 1, fp);
       }
     }
@@ -163,10 +164,10 @@ int main (int argc, char **argv)
       ret = fread(&saved_slack_status, sizeof(int), 1, fp);
     }
     if (slack_status != saved_slack_status) {
-      printf("Updating slack status file with %d\n", slack_status);
+      fprintf(stdout, "Updating slack status file with %d\n", slack_status);
       rewind(fp);
       fwrite(&slack_status, sizeof(int), 1, fp);
-      printf("Updating slack status with curl\n");
+      fprintf(stdout, "Updating slack status with curl\n");
       do_curl(slack_status);
     }
     fclose(fp);
