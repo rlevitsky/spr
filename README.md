@@ -1,5 +1,5 @@
 # Slack Power Reporter (spr)
-Slack Power Reporter - simple program which reads your battery status from sysfs and publish changes at your Slack profile.
+Slack Power Reporter - simple program which reads your battery status from sysfs and publishes change at your Slack profile.
 
 ## Recuirement
 
@@ -43,7 +43,10 @@ You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy files from daemontools directory to your services' locatoin. Make sure **'run'** and **'log/run'** files have executable bit set. Copy **'spr'** executable to the same directory. Activate as usual with **'ln -s spr'**.
+Copy files from daemontools directory to your service's location.<br>
+Make sure **'run'** and **'log/run'** files have executable bit set.<br>
+Copy **'spr'** executable to your service directory, make sure 'run' file has a proper path for it.<br>
+Activate as usual with **'ln -s ../spr'**.<br>
 
 ### Systemd
 
@@ -61,8 +64,8 @@ Tell systemd reload configuration, enable and start your service:
 ```
 ## Troubleshooting
 
-Here's command line to debug Slack API with curl invocation (use your token here). You want to see JSON output starting with **"ok":true** from server
+Here's command line to debug Slack API with curl invocation (use your token here):
 ```
 % curl -q -H "Authorization: Bearer xoxp-XXXXXXXXXX-XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" -H "Content-type: application/json; charset=utf-8" https://slack.com/api/users.profile.set -X POST -d'{"profile": {"status_text": "On Battery", "status_emoji": ":battery:", "status_expiration": 0}}'
 ```
-
+ You want to see JSON output starting with **"ok":true** from server and "On Battery" status text with green batter image at your profile.
