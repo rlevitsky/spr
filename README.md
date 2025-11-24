@@ -25,17 +25,17 @@ You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy files from daemontools directory to your services' locatoin. Make sure **'run'** and **'log/run'** have executable bit set. Copy **'spr'** executable to the same directory. Activate as usual with **'ln -s spr'**.
+Copy files from daemontools directory to your services' locatoin. Make sure **'run'** and **'log/run'** files have executable bit set. Copy **'spr'** executable to the same directory. Activate as usual with **'ln -s spr'**.
 
 ### Systemd
 
 Copy service definition file to the user directory:
 ```
-% sudo cp systemd/spr.service /etc/systemd/user/
+% cp systemd/spr.service ~/.config/systemd/user/
 ```
 Make sure you've stated correct path to the **spr** executable at the **spr.service** definition
 
-Tell systemd reload, enable and start your service:
+Tell systemd reload configuration, enable and start your service:
 ```
 % systemctl --user daemon-reload
 % systemctl --user enable spr

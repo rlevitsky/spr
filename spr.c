@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <unistd.h>
 #include <curl/curl.h>
 
@@ -14,7 +13,7 @@
 #define CONTYPE "Content-type: application/json; charset=utf-8"
 #define ONBATTERY "{\"profile\": {\"status_text\": \"On Battery\", \"status_emoji\": \":battery:\", \"status_expiration\": 0}}"
 #define LOWBATTERY "{\"profile\": {\"status_text\": \"Low Battery\", \"status_emoji\": \":low_battery:\", \"status_expiration\": 0}}"
-#define ONLINE "{\"profile\": {\"status_text\": \"On Line\", \"status_emoji\": \":electric_plug:\", \"status_expiration\": 0}}"
+#define CHARGING "{\"profile\": {\"status_text\": \"Charging\", \"status_emoji\": \":electric_plug:\", \"status_expiration\": 0}}"
 #define CLEAN "{\"profile\": {\"status_text\": \"\", \"status_emoji\": \"\", \"status_expiration\": 0}}"
 
 typedef struct mybuff {
@@ -49,7 +48,6 @@ int do_curl (int status)
   res = curl_global_init(CURL_GLOBAL_ALL);
   if(res)
     return (int)res;
-  
   curl = curl_easy_init();
   if(curl) {
     curl_easy_setopt(curl, CURLOPT_URL, URL);
@@ -74,7 +72,7 @@ int do_curl (int status)
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, LOWBATTERY);
       break;
     case 3:
-      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, ONLINE);
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, CHARGING);
       break;
     default:
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, CLEAN);
@@ -94,9 +92,9 @@ int do_curl (int status)
   }
   char *a = strstr(docbuf.bp, "\"ok\":true");
   if ( a != NULL ) {
-    fprintf(stdout, "Ok received\n");
+    printf("Ok received\n");
   }
-  else fprintf(stdout, "Ok not found\n%s\n", (char *)docbuf.bp);
+  else printf("Ok not found\n%s\n", (char *)docbuf.bp);
   return 0;
 }
 
@@ -106,16 +104,14 @@ int main (int argc, char **argv)
   char *tmpfile = "/tmp/spr.tmp";
   FILE *fp;
   size_t ret;
-  unsigned char buf[16], timestring[21];
+  unsigned char buf[16];
   int percent, slack_status, saved_slack_status;
-  time_t now;
-  struct tm *t;
 
   sleep(1);
 
+  setvbuf(stdout, NULL, _IOLBF, 0);
+
   while (1) {
-    now = time(NULL);
-    t = gmtime(&now);
     fp = fopen(percentpath, "r");
     if (!fp) {
       perror("fopen");
@@ -143,9 +139,7 @@ int main (int argc, char **argv)
     else if (strstr(buf, "Full") || strstr(buf, "Not charging")) slack_status = 0;
     else slack_status = 9;
   
-    strftime(timestring, 21, "%Y-%m-%dT%H:%M:%SZ", t);
-    //fprintf(stdout,"%s %s %d\n", timestring, buf, percent);
-    fprintf(stdout,"%s %d\n", buf, percent);
+    printf("%s %d\n", buf, percent);
 
     fp = fopen(tmpfile, "r+");
     if (fp == NULL) {
@@ -156,7 +150,7 @@ int main (int argc, char **argv)
       }
       else {
         saved_slack_status = slack_status;
-        fprintf(stdout, "Writing new status to file\n");
+        printf("Writing new status to file\n");
         fwrite(&slack_status, sizeof(int), 1, fp);
       }
     }
@@ -164,14 +158,14 @@ int main (int argc, char **argv)
       ret = fread(&saved_slack_status, sizeof(int), 1, fp);
     }
     if (slack_status != saved_slack_status) {
-      fprintf(stdout, "Updating slack status file with %d\n", slack_status);
+      printf("Updating slack status file with %d\n", slack_status);
       rewind(fp);
       fwrite(&slack_status, sizeof(int), 1, fp);
-      fprintf(stdout, "Updating slack status with curl\n");
+      printf("Updating slack status with curl\n");
       do_curl(slack_status);
     }
     fclose(fp);
-    sleep(15);
+    sleep(30);
   }
   return slack_status;
 }
