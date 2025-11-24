@@ -3,7 +3,19 @@ Slack Power Reporter - simple program which reads your battery status from sysfs
 
 ## Recuirement
 
-You need Slack user token to authenticate your program. Please refer Slack manual. You have to grant your token with **'users.profile.set'** permission to make it able to modify your Slack status.
+You need Slack user token to authenticate your program, therefore, you need to create "Slack App" for this.
+
+In Slack, click
+  More -> Tools -> Apps -> Open in Slack Marketplace
+In browser, click
+  Build -> Create New App -> From Scratch -> Create
+In App Configuration page, select "OAuth and permissions", click
+  Scopes -> User Token Scope -> Add an OAuth Scope -> select "user.profile:write"
+Then select "Install App" and click on Install button.
+
+After successfull installation, you'll be provided with "User OAuth Token". Keep it to use in your program.
+
+Please refer Slack manual for additional information.
 
 ## Dependencies
 
