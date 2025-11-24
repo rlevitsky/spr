@@ -43,18 +43,18 @@ You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy files from daemontools directory to your service's location.<br>
+Copy files from 'daemontools' directory to your service's location.<br>
 Make sure **'run'** and **'log/run'** files have executable bit set.<br>
 Copy **'spr'** executable to your service directory, make sure 'run' file has a proper path for it.<br>
 Activate as usual with **'ln -s ../spr'**.<br>
 
 ### Systemd
 
-Copy service definition file to the user directory:
+Copy service definition file from 'systemd' directory to the user directory:
 ```
 % cp systemd/spr.service ~/.config/systemd/user/
 ```
-Make sure you've stated correct path to the **spr** executable at the **spr.service** definition
+Make sure you've stated correct path to the **spr** executable at the **spr.service** definition file.
 
 Tell systemd reload configuration, enable and start your service:
 ```
@@ -68,4 +68,4 @@ Here's command line to debug Slack API with curl invocation (use your token here
 ```
 % curl -q -H "Authorization: Bearer xoxp-XXXXXXXXXX-XXXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" -H "Content-type: application/json; charset=utf-8" https://slack.com/api/users.profile.set -X POST -d'{"profile": {"status_text": "On Battery", "status_emoji": ":battery:", "status_expiration": 0}}'
 ```
- You want to see JSON output starting with **"ok":true** from server and "On Battery" status text with green batter image at your profile.
+ You want to see JSON output starting with **"ok":true** from server and "On Battery" status text with green battery image at your profile.
