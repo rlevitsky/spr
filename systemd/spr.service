@@ -3,7 +3,7 @@ Description=Slack Power Reporter
 
 [Service]
 Type=simple
-ExecStart=/home/rle/service/spr/spr
+ExecStart=/home/rle/bin/spr
 Restart=on-failure
 
 [Install]
