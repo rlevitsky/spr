@@ -109,8 +109,8 @@ int main (int argc, char **argv)
   char *tmpfile = "/tmp/spr.tmp";
   FILE *fp;
   size_t ret;
-  unsigned char buf[16];
-  int percent, slack_status, saved_slack_status;
+  unsigned char buf[16], log[32], previous_log[32] = "";
+  int percent, slack_status, saved_slack_status, log_length;
 
   sleep(1);
 
@@ -145,7 +145,11 @@ int main (int argc, char **argv)
     else if (strstr(buf, "Full") || strstr(buf, "Not charging")) slack_status = 0;
     else slack_status = 4;
   
-    printf("%s %d\n", buf, percent);
+    log_length = snprintf(log, 32, "%s %d", buf, percent);
+    if ( memcmp(log, previous_log, log_length) ) {
+      printf("%s\n", log);
+      memcpy(previous_log, log, log_length);
+    }
 
     fp = fopen(tmpfile, "r+");
     if (fp == NULL) {
@@ -181,7 +185,7 @@ int main (int argc, char **argv)
       fwrite(&slack_status, sizeof(int), 1, fp);
     }
     fclose(fp);
-    sleep(30);
+    sleep(15);
   }
   return slack_status;
 }
