@@ -15,6 +15,7 @@
 #define LOWBATTERY "{\"profile\": {\"status_text\": \"Low Battery\", \"status_emoji\": \":low_battery:\", \"status_expiration\": 0}}"
 #define CHARGING "{\"profile\": {\"status_text\": \"Charging\", \"status_emoji\": \":electric_plug:\", \"status_expiration\": 0}}"
 #define CLEAN "{\"profile\": {\"status_text\": \"\", \"status_emoji\": \"\", \"status_expiration\": 0}}"
+#define UNKNOWN "{\"profile\": {\"status_text\": \"Power status Unkown\", \"status_emoji\": \":grey_question:\", \"status_expiration\": 0}}"
 
 typedef struct mybuff {
   void* bp;
@@ -73,6 +74,9 @@ int do_curl (int status)
       break;
     case 3:
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, CHARGING);
+      break;
+    case 4:
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, UNKNOWN);
       break;
     default:
       curl_easy_setopt(curl, CURLOPT_POSTFIELDS, CLEAN);
@@ -137,7 +141,7 @@ int main (int argc, char **argv)
     }
     else if (strstr(buf, "Charging")) slack_status = 3;
     else if (strstr(buf, "Full") || strstr(buf, "Not charging")) slack_status = 0;
-    else slack_status = 9;
+    else slack_status = 4;
   
     printf("%s %d\n", buf, percent);
 
@@ -152,6 +156,8 @@ int main (int argc, char **argv)
         saved_slack_status = slack_status;
         printf("Writing new status to file\n");
         fwrite(&slack_status, sizeof(int), 1, fp);
+        printf("Updating slack status with curl\n");
+        do_curl(slack_status);
       }
     }
     else {
