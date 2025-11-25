@@ -84,21 +84,22 @@ int do_curl (int status)
     }
     
     res = curl_easy_perform(curl);
-    if ( res ) {
+    if (res) {
       ecode = res;
       fprintf(stderr, "Got error from libcurl: %d\n", res);
       long response_code;
       res = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-      if((CURLE_OK == res) && response_code)
+      if ((CURLE_OK == res) && response_code)
         fprintf(stderr, "We received response code: %ld\n", response_code);
     }
     curl_easy_cleanup(curl);
   }
   char *a = strstr(docbuf.bp, "\"ok\":true");
-  if ( a != NULL ) {
-    printf("Ok received\n");
+  if ( a == NULL ) {
+    printf("Ok not found\n%s\n", (char *)docbuf.bp);
+    return 1;
   }
-  else printf("Ok not found\n%s\n", (char *)docbuf.bp);
+  printf("Ok received\n");
   return 0;
 }
 
@@ -140,6 +141,7 @@ int main (int argc, char **argv)
       else slack_status=2;
     }
     else if (strstr(buf, "Charging")) slack_status = 3;
+    else if (strstr(buf, "Unknown")) slack_status = 4;
     else if (strstr(buf, "Full") || strstr(buf, "Not charging")) slack_status = 0;
     else slack_status = 4;
   
@@ -154,21 +156,29 @@ int main (int argc, char **argv)
       }
       else {
         saved_slack_status = slack_status;
+        printf("Updating slack status via http\n");
+        if (do_curl(slack_status)) {
+          fprintf(stderr, "http call error, exiting...\n");
+          sleep(5);
+          exit(1);
+        }
         printf("Writing new status to file\n");
         fwrite(&slack_status, sizeof(int), 1, fp);
-        printf("Updating slack status with curl\n");
-        do_curl(slack_status);
       }
     }
     else {
       ret = fread(&saved_slack_status, sizeof(int), 1, fp);
     }
     if (slack_status != saved_slack_status) {
+      printf("Updating slack status via http\n");
+      if (do_curl(slack_status)) {
+        fprintf(stderr, "http call error, exiting...\n");
+        sleep(5);
+        exit(1);
+      }
       printf("Updating slack status file with %d\n", slack_status);
       rewind(fp);
       fwrite(&slack_status, sizeof(int), 1, fp);
-      printf("Updating slack status with curl\n");
-      do_curl(slack_status);
     }
     fclose(fp);
     sleep(30);
