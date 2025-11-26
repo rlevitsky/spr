@@ -43,13 +43,15 @@ You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy files from 'daemontools' directory to your service's location.<br>
+Copy **'spr'** executable to your service directory.
+Copy files from 'daemontools' directory to your service directory.<br>
 Make sure **'run'** and **'log/run'** files have executable bit set.<br>
-Copy **'spr'** executable to your service directory, make sure 'run' file has a proper path for it.<br>
+Make sure **'run'** file has a proper path for it.<br>
 Activate as usual with **'ln -s ../spr'**.<br>
 
 ### Systemd
 
+Copy **'spr'** executable to to the selected directory.<br>
 Copy service definition file from 'systemd' directory to the user directory:
 ```
 % cp systemd/spr.service ~/.config/systemd/user/
