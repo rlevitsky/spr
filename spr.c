@@ -106,11 +106,10 @@ int do_curl (int status)
 int main (int argc, char **argv)
 {
   char *statuspath = "/sys/class/power_supply/BAT0/status", *percentpath = "/sys/class/power_supply/BAT0/capacity";
-  char *tmpfile = "/tmp/spr.tmp";
   FILE *fp;
   size_t ret;
   unsigned char buf[16], log[32], previous_log[32] = "";
-  int percent, slack_status, saved_slack_status, log_length;
+  int percent, slack_status, previous_slack_status = 255, log_length;
 
   sleep(1);
 
@@ -157,41 +156,16 @@ int main (int argc, char **argv)
       memcpy(previous_log, log, log_length);
     }
 
-    // update slack status via http and save to tmp file
-    fp = fopen(tmpfile, "r+");
-    if (fp == NULL) {
-      fp = fopen(tmpfile, "w");
-      if (fp == NULL) {
-        fprintf(stderr, "Unable to create temporary file\n");
-        exit(1);
-      }
-      else {
-        saved_slack_status = slack_status;
-        printf("Updating slack status via http\n");
-        if (do_curl(slack_status)) {
-          fprintf(stderr, "http call error, exiting...\n");
-          sleep(5);
-          exit(1);
-        }
-        printf("Writing new status to file\n");
-        fwrite(&slack_status, sizeof(int), 1, fp);
-      }
-    }
-    else {
-      ret = fread(&saved_slack_status, sizeof(int), 1, fp);
-    }
-    if (slack_status != saved_slack_status) {
+    // check if slack status is the same as preivous, update if not
+    if (slack_status != previous_slack_status) {
       printf("Updating slack status via http\n");
       if (do_curl(slack_status)) {
         fprintf(stderr, "http call error, exiting...\n");
         sleep(5);
         exit(1);
       }
-      printf("Updating slack status file with %d\n", slack_status);
-      rewind(fp);
-      fwrite(&slack_status, sizeof(int), 1, fp);
+      previous_slack_status = slack_status;
     }
-    fclose(fp);
 
     sleep(15);
   }
