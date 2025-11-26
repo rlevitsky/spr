@@ -114,9 +114,12 @@ int main (int argc, char **argv)
 
   sleep(1);
 
+  // stdout is fully buffered for me, so switch it to line buffering for proper logging
   setvbuf(stdout, NULL, _IOLBF, 0);
 
+  // main cycle
   while (1) {
+    // read percentage
     fp = fopen(percentpath, "r");
     if (!fp) {
       perror("fopen");
@@ -127,6 +130,7 @@ int main (int argc, char **argv)
     fclose(fp);
     sscanf(buf, "%d", &percent);
   
+    // read status
     fp = fopen(statuspath, "r");
     if (!fp) {
       perror("fopen");
@@ -136,6 +140,7 @@ int main (int argc, char **argv)
     memset(buf + ret - 1, 0, 1); 
     fclose(fp);
 
+    // craft slack status from status and percentage
     if (strstr(buf, "Discharging")) {
       if (percent >= 30) slack_status = 1;
       else slack_status=2;
@@ -145,12 +150,14 @@ int main (int argc, char **argv)
     else if (strstr(buf, "Full") || strstr(buf, "Not charging")) slack_status = 0;
     else slack_status = 4;
   
+    // check if log line is the same as previous one, print if differs
     log_length = snprintf(log, 32, "%s %d", buf, percent);
     if ( memcmp(log, previous_log, log_length) ) {
       printf("%s\n", log);
       memcpy(previous_log, log, log_length);
     }
 
+    // update slack status via http and save to tmp file
     fp = fopen(tmpfile, "r+");
     if (fp == NULL) {
       fp = fopen(tmpfile, "w");
@@ -185,6 +192,7 @@ int main (int argc, char **argv)
       fwrite(&slack_status, sizeof(int), 1, fp);
     }
     fclose(fp);
+
     sleep(15);
   }
   return slack_status;
