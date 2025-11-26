@@ -43,7 +43,7 @@ You have to use some management program, like daemontools or systemd.
 
 ### Daemontools (runit)
 
-Copy **'spr'** executable to your service directory.
+Copy **'spr'** executable to your service directory.<br>
 Copy files from 'daemontools' directory to your service directory.<br>
 Make sure **'run'** and **'log/run'** files have executable bit set.<br>
 Make sure **'run'** file has a proper path for it.<br>
